@@ -1,0 +1,49 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-db
+    networks:
+      - default
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U listmonk']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  app:
+    container_name: ${COMPOSE_PROJECT_NAME}-app
+    image: listmonk/listmonk:latest
+    networks:
+      - default
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./data/app/config/config.toml:/listmonk/config.toml
+      - ./data/app/uploads:/listmonk/uploads
+    ports:
+      - 9000:9000
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--spider',
+          '--auth-no-challenge',
+          '--http-user=${LISTMONK_USERNAME}',
+          '--http-password=${LISTMONK_PASSWORD}',
+          'http://localhost:9000/api/health'
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
