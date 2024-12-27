@@ -12,7 +12,7 @@ services:
       - .env
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U listmonk']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
       timeout: 5s
       retries: 6
@@ -22,10 +22,21 @@ services:
     image: listmonk/listmonk:latest
     env_file:
       - .env
+    environment:
+      - LISTMONK_app__address=0.0.0.0:9000
+      - LISTMONK_app__admin_username=${LISTMONK_ADMIN_USERNAME:-}
+      - LISTMONK_app__admin_password=${LISTMONK_ADMIN_PASSWORD:-}
+      - LISTMONK_db__host=db
+      - LISTMONK_db__port=5432
+      - LISTMONK_db__database=${POSTGRES_DB}
+      - LISTMONK_db__user=${POSTGRES_USER}
+      - LISTMONK_db__password=${POSTGRES_PASSWORD}
+      - LISTMONK_db__ssl_mode=disable
+      - LISTMONK_db__max_open=25
+      - LISTMONK_db__max_idle=25
+      - LISTMONK_db__max_lifetime=300s
     depends_on:
       - db
-    volumes:
-      - ./data/app/config/config.toml:/listmonk/config.toml
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]

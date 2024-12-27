@@ -10,12 +10,6 @@ This is a simple docker-compose setup for [Listmonk](https://listmonk.app/), a s
 * Sample configurations
 * Local persitation of uploaded files and database
 
-### Environments
-
-* **Local testing** It includes a compose file for local development.
-* **Production ready** It includes a compose file for production.
-* **Production traefik** It includes a compose file for production with traefik as reverse proxy.
-
 ## Prerequisites
 
 * Docker
@@ -29,13 +23,8 @@ Copy the `.env.sample` file to `.env` and change the content to your needs.
 cp .env.sample .env
 ```
 
-### Locally
-
-```bash
-docker compose -f docker-compose.local.yml up -d
-```
-
-### Production
+## Run
 
 ```bash
 docker compose up -d
+```
