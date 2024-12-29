@@ -1,50 +1,62 @@
-version: '3.7'
-
 services:
-  db:
-    image: postgres:13-alpine
-    container_name: ${COMPOSE_PROJECT_NAME}-db
-    networks:
-      - default
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    env_file:
-      - .env
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
-      interval: 10s
-      timeout: 5s
-      retries: 6
-
-  app:
-    container_name: ${COMPOSE_PROJECT_NAME}-app
-    image: listmonk/listmonk:latest
-    env_file:
-      - .env
+  listmonk:
+    image: 'listmonk/listmonk:latest'
     environment:
-      - LISTMONK_app__address=0.0.0.0:9000
-      - LISTMONK_app__admin_username=${LISTMONK_ADMIN_USERNAME:-}
-      - LISTMONK_app__admin_password=${LISTMONK_ADMIN_PASSWORD:-}
-      - LISTMONK_db__host=db
+      - SERVICE_FQDN_LISTMONK_9000
+      - 'LISTMONK_app__address=0.0.0.0:9000'
+      - LISTMONK_db__host=postgres
+      - LISTMONK_db__name=listmonk
+      - LISTMONK_db__user=$SERVICE_USER_POSTGRES
+      - LISTMONK_db__password=$SERVICE_PASSWORD_POSTGRES
       - LISTMONK_db__port=5432
-      - LISTMONK_db__database=${POSTGRES_DB}
-      - LISTMONK_db__user=${POSTGRES_USER}
-      - LISTMONK_db__password=${POSTGRES_PASSWORD}
-      - LISTMONK_db__ssl_mode=disable
-      - LISTMONK_db__max_open=25
-      - LISTMONK_db__max_idle=25
-      - LISTMONK_db__max_lifetime=300s
+      - TZ=Etc/UTC
+    volumes:
+      - 'listmonk-data:/listmonk/uploads'
     depends_on:
-      - db
-    restart: unless-stopped
+      postgres:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-
-networks:
-  default:
-    external:
-      name: ${COMPOSE_PROJECT_NAME}
+      test:
+        - CMD
+        - wget
+        - '-q'
+        - '--spider'
+        - 'http://127.0.0.1:9000'
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    labels:
+      - 'traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS'
+      - 'traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=http://localhost:3000,https://mokz.ai,https://*.mokz.ai'
+      - 'traefik.http.middlewares.cors.headers.accesscontrolallowheaders=Content-Type,Authorization'
+      - traefik.http.middlewares.cors.headers.accesscontrolallowcredentials=true
+      - traefik.http.middlewares.cors.headers.accesscontrolmaxage=100
+      - traefik.http.routers.listmonk.middlewares=cors@docker
+  listmonk-initial-database-setup:
+    image: 'listmonk/listmonk:latest'
+    command: './listmonk --install --yes --idempotent'
+    restart: 'no'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - LISTMONK_db__host=postgres
+      - LISTMONK_db__name=listmonk
+      - LISTMONK_db__user=$SERVICE_USER_POSTGRES
+      - LISTMONK_db__password=$SERVICE_PASSWORD_POSTGRES
+      - LISTMONK_db__port=5432
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_DB=listmonk
+      - POSTGRES_PASSWORD=$SERVICE_PASSWORD_POSTGRES
+      - POSTGRES_USER=$SERVICE_USER_POSTGRES
+    volumes:
+      - 'pg-data:/var/lib/postgresql/data'
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}'
+      interval: 5s
+      timeout: 20s
+      retries: 10

@@ -1,30 +1,10 @@
-# Listmonk with Docker Compose
+# Listmonk with Docker Compose for Coolify
 
 ## Introduction
 
-This is a simple docker-compose setup for [Listmonk](https://listmonk.app/), a standalone, self-hosted, newsletter and mailing list manager. It is fast, feature-rich, and packed into a single binary. It uses a PostgreSQL database to store data.
+This is the [docker compose file](https://github.com/coollabsio/coolify/blob/main/templates/compose/listmonk.yaml) for Listmonk from Coolify but with CORS enabled for localhost and mokz.ai domain so the Listmonk API could be accessed by my apps.
 
-## Features
+## Use in Coolify
 
-* Health check for all included services
-* Sample configurations
-* Local persitation of uploaded files and database
+Copy and paste the `docker-compose.yml` file into a new Docker Compose project in Coolify. Set the domain properly and deploy. 
 
-## Prerequisites
-
-* Docker
-* Docker Compose
-
-## Getting Started
-
-Copy the `.env.sample` file to `.env` and change the content to your needs.
-
-```bash
-cp .env.sample .env
-```
-
-## Run
-
-```bash
-docker compose up -d
-```
