@@ -1,7 +1,7 @@
 services:
   listmonk:
     image: 'listmonk/listmonk:latest'
-    command: "./listmonk --static-dir=/listmonk/static"
+    command: './listmonk --static-dir=/listmonk/static'
     environment:
       - SERVICE_FQDN_LISTMONK_9000
       - 'LISTMONK_app__address=0.0.0.0:9000'
