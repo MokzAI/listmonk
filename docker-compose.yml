@@ -13,7 +13,6 @@ services:
       - TZ=Etc/UTC
     volumes:
       - 'listmonk-data:/listmonk/uploads'
-      - './static:/listmonk/static'
     build:
       context: .
       dockerfile: Dockerfile
