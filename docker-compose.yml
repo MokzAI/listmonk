@@ -13,9 +13,8 @@ services:
       - TZ=Etc/UTC
     volumes:
       - 'listmonk-data:/listmonk/uploads'
-    build:
-      context: .
-      dockerfile: Dockerfile
+      - './static/email-templates:/listmonk/static/email-templates'
+      - './static/public:/listmonk/static/public'
     depends_on:
       postgres:
         condition: service_healthy
