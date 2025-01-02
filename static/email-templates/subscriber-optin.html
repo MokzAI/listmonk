@@ -1,6 +1,5 @@
 {{ define "subscriber-optin" }}
 {{ template "header" . }}
-<h1>HELLO WORLD!</h1>
 <h2>{{ L.Ts "email.optin.confirmSubTitle" }}</h2>
 <p>{{ L.Ts "email.optin.confirmSubWelcome" }} {{ .Subscriber.FirstName }}</p>
 <p>{{ L.Ts "email.optin.confirmSubInfo" }}</p>
@@ -14,6 +13,27 @@
     {{ end }}
 </ul>
 <p>{{ L.Ts "email.optin.confirmSubHelp" }}</p>
+
+<p>hai... try 1-click opt-in:</p>
+<form method="post" class="optin-form">
+    <ul>
+        {{ range $i, $l := .Data.Lists }}
+            <input type="hidden" name="l" value="{{ $l.UUID }}" />
+            {{ if eq $l.Type "public" }}
+                <li>{{ $l.Name }}</li>
+            {{ else }}
+                <li>{{ L.Ts "public.subPrivateList" }}</li>
+            {{ end }}
+        {{ end }}
+    </ul>
+    <p>
+        <input type="hidden" name="confirm" value="true" />
+        <button type="submit" class="button" id="btn-unsub">
+            {{ L.Ts "public.confirmSub" }}
+        </button>
+    </p>
+</form>
+
 <p>
     <a href="{{ .OptinURL }}" class="button">{{ L.Ts "email.optin.confirmSub" }}</a>
 </p>
