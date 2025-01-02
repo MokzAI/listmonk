@@ -27,7 +27,9 @@
 </section>
 
 <script>
-    document.querySelector("optin-form").submit();
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector(".optin-form").submit();
+    });
 </script>
 
 {{ template "footer" .}}
