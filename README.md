@@ -14,5 +14,19 @@ For customizing static files like opt-in email or landing page, see `/static` di
 
 ---
 
-todo
-- [ ] use of .env file - https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
+Running static files locally w/ hotreload.
+
+1. Install `air`
+
+```sh
+go install github.com/air-verse/air@latest
+export PATH=$PATH:$(go env GOPATH)/bin # Add this to your .zshrc or .bashrc
+```
+
+2. Run `air`
+
+```sh
+air
+```
+
+For example, if you wanted to preview the opt-in email, you would go to `http://localhost:8080/public/templates/opt-in.html`.
