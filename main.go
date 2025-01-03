@@ -22,6 +22,12 @@ func (l L) Ts(key string) string {
 }
 
 func main() {
+	// Define configuration constants at the top of main
+	const (
+		baseURL = "http://localhost:8000"
+		logoURL = baseURL + "/public/static/logo.svg"
+	)
+
 	// Template handler for email templates
 	emailHandler := func(w http.ResponseWriter, r *http.Request) {
 		// Extract template name from URL path
@@ -119,6 +125,9 @@ func main() {
 			"RootURL": func() string { 
 				return "http://localhost:8000" 
 			},
+			"LogoURL": func() string {
+				return logoURL
+			},
 			"Safe": func(s string) template.HTML {
 				return template.HTML(s)
 			},
@@ -161,7 +170,7 @@ func main() {
 			MessageURL string
 		}{
 			L:       L{},
-			LogoURL: "/public/static/logo.svg",
+			LogoURL: logoURL,
 			Lists: []struct{ Name, Type string }{
 				{Name: "Test List", Type: "public"},
 			},
