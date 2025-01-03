@@ -356,7 +356,7 @@ func main() {
 	http.HandleFunc("/public/", publicHandler)
 	http.Handle("/", http.FileServer(http.Dir("static")))  // Keep this last
 
-	log.Print("Listening on :8000...")
+	log.Print("[Server] 🏃 http://localhost:8000")
 	err := http.ListenAndServe(":8000", nil)
 	if err != nil {
 		log.Fatal(err)
