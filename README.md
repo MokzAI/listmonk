@@ -29,4 +29,4 @@ export PATH=$PATH:$(go env GOPATH)/bin # Add this to your .zshrc or .bashrc
 air
 ```
 
-For example, if you wanted to preview the opt-in email, you would go to `http://localhost:8080/public/templates/opt-in.html`.
+For example, if you wanted to preview the opt-in email, you would go to `http://localhost:8000/email-templates/subscriber-optin.html`.

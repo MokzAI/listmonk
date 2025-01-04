@@ -10,15 +10,25 @@ import (
 	"strings"
 )
 
-// L represents a simple translation function
+// L represents a translation system
 type L struct{}
 
-func (l L) T(key string) string {
+// Store translations in a package-level variable
+var translations = map[string]string{
+	"email.optin.confirmSubWelcome": "Hi",
+	"email.optin.confirmSub":        "Confirm subscription",
+}
+
+// Update the Ts method to use the translations map
+func (l L) Ts(key string) string {
+	if val, ok := translations[key]; ok {
+		return val
+	}
 	return key
 }
 
-func (l L) Ts(key string) string {
-	return key
+func (l L) T(key string) string {
+	return l.Ts(key)
 }
 
 func main() {

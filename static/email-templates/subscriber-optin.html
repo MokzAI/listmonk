@@ -2,7 +2,7 @@
 {{ template "header" . }}
 
 <p>
-    {{ L.Ts "email.optin.confirmSubWelcome" }} {{ .Subscriber.FirstName }}
+    {{ L.Ts "email.optin.confirmSubWelcome" }} {{ .Subscriber.FirstName }},
 </p>
 
 <p>
@@ -17,5 +17,9 @@
     <a href="{{ .OptinURL }}" class="button">{{ L.Ts "email.optin.confirmSub" }}</a>
 </p>
 
+<p style="font-size: 12px; margin-top: 40px; color: #777; line-height: 1.5;">
+    <span style="font-weight: 600;">“The secret of getting ahead is getting started.”</span>
+    <span style="font-weight: 500;"> -Mark Twain</span>
+</p>
 {{ template "footer" . }}
 {{ end }}
