@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -11,27 +12,68 @@ import (
 )
 
 // L represents a translation system
-type L struct{}
-
-// Store translations in a package-level variable
-var translations = map[string]string{
-	"email.optin.confirmSubWelcome": "Hi",
-	"email.optin.confirmSub":        "Confirm subscription",
+type L struct {
+	translations map[string]map[string]string // map[language]map[key]translation
+	defaultLang string
 }
 
-// Update the Ts method to use the translations map
-func (l L) Ts(key string) string {
-	if val, ok := translations[key]; ok {
-		return val
+// NewL creates a new translation system
+func NewL(defaultLang string) (*L, error) {
+	l := &L{
+		translations: make(map[string]map[string]string),
+		defaultLang: defaultLang,
+	}
+	
+	// Load all JSON files from the i18n directory
+	files, err := filepath.Glob("i18n/*.json")
+	if err != nil {
+		return nil, fmt.Errorf("failed to list i18n files: %v", err)
+	}
+
+	var data []byte
+	for _, file := range files {
+		// Extract language code from filename (e.g., "en" from "en.json")
+		lang := strings.TrimSuffix(filepath.Base(file), ".json")
+		
+		// Read and parse JSON file
+		data, err = os.ReadFile(file)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read %s: %v", file, err)
+		}
+
+		var translations map[string]string
+		if err = json.Unmarshal(data, &translations); err != nil {
+			return nil, fmt.Errorf("failed to parse %s: %v", file, err)
+		}
+
+		l.translations[lang] = translations
+	}
+
+	return l, nil
+}
+
+// Ts returns the translation for the given key in the default language
+func (l *L) Ts(key string) string {
+	if translations, ok := l.translations[l.defaultLang]; ok {
+		if val, ok := translations[key]; ok {
+			return val
+		}
 	}
 	return key
 }
 
-func (l L) T(key string) string {
+// T is an alias for Ts
+func (l *L) T(key string) string {
 	return l.Ts(key)
 }
 
 func main() {
+	// Initialize the translation system
+	l, err := NewL("en") // Use "en" as default language
+	if err != nil {
+		log.Fatalf("Failed to initialize translations: %v", err)
+	}
+
 	// Define configuration constants at the top of main
 	const (
 		baseURL = "http://localhost:8000"
@@ -131,7 +173,7 @@ func main() {
 		
 		// Add all necessary template functions
 		tmpl = tmpl.Funcs(template.FuncMap{
-			"L": func() L { return L{} },
+			"L": func() *L { return l },
 			"RootURL": func() string { 
 				return "http://localhost:8000" 
 			},
@@ -162,7 +204,7 @@ func main() {
 
 		// Template data with all possible fields
 		data := struct {
-			L          L
+			L          *L
 			LogoURL    string
 			Lists      []struct{ Name, Type string }
 			Subscriber struct{ 
@@ -179,7 +221,7 @@ func main() {
 			SiteURL    string
 			MessageURL string
 		}{
-			L:       L{},
+			L:       l,
 			LogoURL: logoURL,
 			Lists: []struct{ Name, Type string }{
 				{Name: "Test List", Type: "public"},
@@ -367,7 +409,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("static")))  // Keep this last
 
 	log.Print("[Server] 🏃 http://localhost:8000")
-	err := http.ListenAndServe(":8000", nil)
+	err = http.ListenAndServe(":8000", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
