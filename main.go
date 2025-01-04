@@ -406,7 +406,7 @@ func main() {
 	http.HandleFunc("/email-templates/", emailHandler)
 	http.HandleFunc("/public/templates/", publicTemplatesHandler)
 	http.HandleFunc("/public/", publicHandler)
-	http.Handle("/", http.FileServer(http.Dir("static")))  // Keep this last
+	http.Handle("/", http.FileServer(http.Dir("static")))
 
 	log.Print("[Server] 🏃 http://localhost:8000")
 	err = http.ListenAndServe(":8000", nil)

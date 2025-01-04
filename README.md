@@ -14,7 +14,7 @@ For customizing static files like opt-in email or landing page, see `/static` di
 
 ---
 
-Running static files locally w/ hotreload.
+## Running static files locally w/ hot-reload.
 
 1. Install `air`
 
