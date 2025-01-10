@@ -2,16 +2,16 @@
 {{ template "header" .}}
 
 <section class="center">
-	<a href="admin" class="button">{{ L.T "users.login" }}</a>
+	<a href="admin" class="button" style="background-color: #111;">{{ L.T "users.login" }}</a>
 
-	<div class="home-options">
+	<!-- <div class="home-options">
 		{{ if .EnablePublicSubPage }}
 			<a href="{{ .RootURL }}/subscription/form">{{ L.T "public.sub" }}</a>
 		{{ end }}
 		{{ if .EnablePublicArchive }}
 		    <a href="{{ .RootURL }}/archive">{{ L.T "public.archiveTitle" }}</a>
 		{{ end }}
-	</div>
+	</div> -->
 </section>
 
 {{ template "footer" .}}
